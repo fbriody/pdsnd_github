@@ -74,7 +74,7 @@ three_cities %>%
 Across all birth years males had about three times more rentals than females. The distribution by year was similar except for those born in the 1970's. While the number of males renting increased as birth year increased, females actually saw a slight downward trend. For some reason, females in their mid 40's are proportionally less likely to rent than males. 
 
 ## Question 3 
-### Compare the number of one way versus round trip rentals at each starting location in Chicago. 
+### For Chicago, how do the number of one way versus round trip rentals at each starting location compare? 
 ```{r}
 #Count the number of round trip rentals at each starting location
 n_round <- chi %>% 
