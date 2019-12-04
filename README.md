@@ -1,15 +1,18 @@
 ### Date created
-Include the date you created this project and README file.
+December 03, 2019
 
 ### Project Title
-Replace the Project Title
+Rideshare Project
 
 ### Description
-Describe what your project is about and what it does
+An analysis of three questions using rideshare data from Chicag, New York City and Washington DC. Answered questions are:
+1. Is there an association between the number of rentals and the day of the week?
+2. Is there an association between birth year, gender and number of rentals for New York and Chicago?
+3. Compare the number of one way versus round trip rentals at each starting location in Chicago. (OK, not a question but interesting nonetheless.)
 
 ### Files used
-Include the files used
+Data files are *chicago.csv*, *new_york_city.csv* and *washington.csv*.
 
 ### Credits
-It's important to give proper credit. Add links to any repo that inspired you or blogposts you consulted.
+**Data Source** Not available. 
 
