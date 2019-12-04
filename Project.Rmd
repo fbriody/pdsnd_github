@@ -5,6 +5,8 @@ date: "11/21/2019"
 output: html_document
 ---
 
+###Now under git repository
+
 # Import Data
 ```{r}
 ny = read.csv('new_york_city.csv')
