@@ -110,6 +110,7 @@ ggplot(trips, aes(x = n.y, y = n.x, color = Ratio)) +
 ## Answer 3 
 Two locations (Streeter & Grand and Lake Shore Drive & Monroe) had unusually large round trip rentals. This makes sense because the first is Navy Pier, a popular tourist location, and the second is downtown at the lakefront which is also popular with tourists and locals wanting to explore the lakefront bicycle path. The other two highlighted high ratio locations are also along the lakefront. The lowest busiest round trip ratio occurred at Clinton and Washington which is home to the Metra train station, a very busy commuter rail line. Clearly commuters are renting bikes to get to work after riding the train into downtown. (I live in Chicago.)
 
+## Additional Analysis
 Zoom in to explore locations with fewer rentals:
 ```{r}
 #zoom in
