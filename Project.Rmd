@@ -1,0 +1,127 @@
+---
+title: "Project"
+author: "BRIODY"
+date: "11/21/2019"
+output: html_document
+---
+
+# Import Data
+```{r}
+ny = read.csv('new_york_city.csv')
+wash = read.csv('washington.csv')
+chi = read.csv('chicago.csv')
+```
+
+# Set Up and Combine Tables
+```{r}
+#set up
+library(tidyverse)
+
+#add city name to each table 
+city <- rep("Chicago", 300000)
+chi <- cbind(chi, city)
+
+city <- rep("New York City", 300000)
+ny <- cbind(ny, city)
+
+city <- rep("Washington", 300000)
+Gender <- rep(NA, 300000)
+Birth.Year <- rep(NA, 300000)
+wash <- cbind(wash, Gender,Birth.Year, city)
+
+#combine to single table
+three_cities <- rbind(ny,wash,chi)
+```
+
+# Questions
+Note: I teach statistics so I have some familiarity with R. 
+
+## Question 1 
+### Is there an association between the number of rentals and the day of the week? 
+```{r}
+three_cities %>% 
+  #extract day of week from date
+  mutate(dow = weekdays(as.Date(three_cities$Start.Time)), 
+         dow2 = ordered(dow, levels=c("Sunday","Saturday", "Friday", "Thursday","Wednesday", "Tuesday", "Monday"))
+          ) %>% 
+         ggplot(aes(x = dow2)) + 
+         geom_bar(stat = "count", width = 0.3, color = "Blue", fill = "LightBlue") +
+  facet_wrap( ~ city) + 
+  coord_flip() +
+  labs(x = " ", y = "Count (thousands)") +
+  scale_y_continuous(labels = c(0, 10, 20 ,30 ,40, 50)) +
+  theme_light()
+```
+
+## Answer 1 
+While it appears that there are no significant differences between the days, there are a couple of items worth exploring. First, rentals were most popular on Wednesdays for New York and Washington, but Wednesday was the least popular weekday for Chicago. New York and Washington also saw sharp declines on Saturday while the decrease on Saturday for Chicago was not quite as large. Finally, New York showed the most variability between days while Chicago was the most consistent. 
+
+## Question 2  
+### Is there an association between birth year, gender and number of rentals for New York and Chicago? 
+```{r}
+three_cities %>% 
+  filter(Gender == "Male" | Gender == "Female") %>% 
+  ggplot(aes(x=Birth.Year)) + 
+  geom_bar(stat = "count", width = 0.5, fill = "LightBlue", color = "Blue" ) +
+  #zoom in on most likely riders; riders outside this range seems unlikely
+  scale_x_continuous(limits = c(1940,2005), breaks = seq(1940,2010, by = 10)) +
+  facet_wrap(~ Gender) + 
+  labs(x = "Birth Year", y = "", title = "Rides by Gender", subtitle = "Chicago and New York City") +
+  theme_light()
+```
+
+## Answer 2 
+Across all birth years males had about three times more rentals than females. The distribution by year was similar except for those born in the 1970's. While the number of males renting increased as birth year increased, females actually saw a slight downward trend. For some reason, females in their mid 40's are proportionally less likely to rent than males. 
+
+## Question 3 
+### Compare the number of one way versus round trip rentals at each starting location in Chicago. 
+```{r}
+#Count the number of round trip rentals at each starting location
+n_round <- chi %>% 
+  filter(as.character(chi$Start.Station) == as.character(chi$End.Station)) %>% 
+  count(Start.Station) %>% 
+  group_by(Start.Station) %>% 
+  arrange(desc(n))
+
+#Count the number of one way rentals at each starting location
+n_oneway <- chi %>% 
+  count(Start.Station) %>% 
+  group_by(Start.Station) %>% 
+  arrange(desc(n))
+
+#join the two counts by station 
+trips <- full_join(n_round, n_oneway, "Start.Station")
+
+#calculate ratio between round trip and one way 
+trips <- trips %>% 
+  mutate(Ratio = n.x/n.y)
+
+#plot all stations with average ratio line
+ggplot(trips, aes(x = n.y, y = n.x, color = Ratio)) +
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE, formula = y~x-1) +
+  labs(y = "Round Trips", x = "One Way", 
+       title = "Round-Trip vs One-Way Rentals", 
+       subtitle = "Chicago Start Locations") + 
+  geom_text(size = 3, aes(label=ifelse(n.y>4000 | n.x>200,as.character(trips$Start.Station),'')), hjust = 1, vjust = 1.5) +
+  theme_light()
+```
+
+## Answer 3 
+Two locations (Streeter & Grand and Lake Shore Drive & Monroe) had unusually large round trip rentals. This makes sense because the first is Navy Pier, a popular tourist location, and the second is downtown at the lakefront which is also popular with tourists and locals wanting to explore the lakefront bicycle path. The other two highlighted high ratio locations are also along the lakefront. The lowest busiest round trip ratio occurred at Clinton and Washington which is home to the Metra train station, a very busy commuter rail line. Clearly commuters are renting bikes to get to work after riding the train into downtown. (I live in Chicago.)
+
+Zoom in to explore locations with fewer rentals:
+```{r}
+#zoom in
+ggplot(trips, aes(x = n.y, y = n.x, color = Ratio)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  coord_cartesian(xlim = c(0,500), ylim = c(0,50)) +
+  labs(y = "Round Trips", x = "One Way", 
+       title = "Round-Trip vs One-Way Rentals", 
+       subtitle = "Chicago Start Locations") +
+  geom_text(size = 3, aes(label=ifelse(n.y>400 & n.x>40,as.character(trips$Start.Station),'')), hjust = 1, vjust = -1.5) + 
+  theme_light()
+```
+
+Again, the two high ratio points make sense. Albany and Bloomingdale is located next to the new 606 bicycle trail, and the point just below at Ainslie and Marine Drive (not labeled) is also along the lakefront path. 
